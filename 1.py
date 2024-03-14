@@ -31,13 +31,32 @@ def get_food_nutrition(food_name):
         print(f"Error: {e}")
         return {}
 
-# Example usage
-food_name = "bulgogi"
-nutrition_data = get_food_nutrition(food_name)
+def recommend_balanced_food(food_options):
+    """
+    Recommends the food item with the most balanced nutritional profile from the given options.
 
-if nutrition_data:
-    print(f"Nutritional information for {food_name}:")
-    for nutrient, data in nutrition_data.items():
-        print(f"{nutrient}: {data['label']} - {data['quantity']} {data['unit']}")
-else:
-    print("Failed to retrieve nutritional information.")
+    Args:
+        food_options (list): A list of food item names.
+
+    Returns:
+        str: The name of the recommended food item.
+    """
+    nutrition_data = [get_food_nutrition(food) for food in food_options]
+    balanced_scores = []
+
+    for data in nutrition_data:
+        # Calculate a balanced score based on the nutritional data
+        # You can implement your own scoring algorithm here
+        # For simplicity, we'll use the sum of key nutrient quantities as the score
+        score = sum(nutrient.get("quantity", 0) for nutrient in data.values())
+        balanced_scores.append(score)
+
+    max_score_index = balanced_scores.index(max(balanced_scores))
+    recommended_food = food_options[max_score_index]
+
+    return recommended_food
+
+# Example usage
+food_options = ["bulgogi", "bibimbap", "gimbap"]
+recommended_food = recommend_balanced_food(food_options)
+print(f"Recommended food for a balanced nutritional profile: {recommended_food}")
