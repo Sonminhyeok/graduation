@@ -19,12 +19,13 @@ def process_time_of_day(data):
     return data
 # 그룹 모델 학습 함수
 def train_group_model(data, group_model_name):
+    
     X = data[['연도', '월', '일', '식사시간_encoded']]  # 날짜 및 시간대 데이터를 사용
     data = data.astype({'embedding':'int'})
-   
+    
     y = data['embedding']  
     
-    # 심플한 Neural Network 모델 예시
+    
     model = Sequential([
         Dense(64, input_dim=X.shape[1], activation='relu'),
         Dense(32, activation='relu'),
@@ -47,8 +48,10 @@ def train_group_model(data, group_model_name):
     # 모델 저장 (.h5 확장자를 사용하여 저장)
     model.save(group_model_path + '.h5')
     
-    # 모델 평가
+    # # 모델 평가
     evaluation_results = model.evaluate(X_test, y_test)
     print(f"모델 평가 결과 (테스트 데이터): 손실(Loss): {evaluation_results[0]}, MAE: {evaluation_results[1]}")
+    
+    
     
     return model, history

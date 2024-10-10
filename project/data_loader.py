@@ -25,9 +25,10 @@ def cluster_user_habits(data, n_clusters=3, prev_user_groups=None):
     # 날짜 및 식사시간을 클러스터링을 위한 숫자로 변환
     data = process_date(data)  # 연, 월, 일로 변환
     data = process_time_of_day(data)  # 아침, 점심, 저녁 숫자로 변환
-    
+   
     # 사용자 ID 기준으로 그룹화하여 사용자별 데이터를 준비 (embedding, 날짜, 식사시간으로 그룹화)
-    user_groups = data.groupby('사용자 ID').mean()  # 사용자별 평균을 계산
+    user_groups = data.select_dtypes(include='number').groupby('사용자 ID').mean()  # 사용자별 평균을 계산
+    print(user_groups)
     
     # 특성 스케일링
     scaler = StandardScaler()
