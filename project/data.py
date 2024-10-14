@@ -171,6 +171,10 @@ def extract_embedding_sums(df):
     # 결과를 데이터프레임으로 변환
     return pd.DataFrame(results)
 
+
+
+
+
 def main():
 
     file_list = glob.glob('./project/data/embedded_data*.csv')

@@ -41,7 +41,7 @@ def create_time_series_features(data, n_days=3):
     for i in range(n_days, len(data)):
         # X: 현재 날짜 정보 (연도, 월, 일, breakfast_count, breakfast_cuisine, 요일) + 이전 n일간의 임베딩 데이터
         # current_features = data.loc[i, [ '월', '요일', 'breakfast_cuisine']].values
-        current_features = data.loc[i, ['연도', '월', '일', 'breakfast_count', '요일', 'breakfast_cuisine']].values
+        current_features = data.loc[i, ['연도', '월', '일', 'breakfast_count', '요일', 'breakfast_cuisine','breakfast_kobert']].values
         # 이전 n일간의 embedding 데이터 (각각이 다차원 베터)
         past_embeddings = []
         for j in range(1, n_days + 1):
@@ -122,7 +122,7 @@ def plot_y_test_vs_y_pred_line(y_test, y_pred):
         plt.show()
 
 def main():
-    df = pd.read_csv("./project/data/cleaned_main_data1000.csv", encoding='cp949')
+    df = pd.read_csv("./project/data/cleaned_main_data10002.csv", encoding='cp949')
     
     process_date(df)
     df['요일'] = df['날짜'].dt.dayofweek
@@ -130,8 +130,8 @@ def main():
     # Add encoding for breakfast_cuisine
     le = LabelEncoder()
     df['breakfast_cuisine'] = le.fit_transform(df['breakfast_cuisine'])
-    
-    start = [1,3,7]
+    df['breakfast_kobert'] = le.fit_transform(df['breakfast_kobert'])
+    start = [2,14]
     for i in start:
         model, scaler_x, scaler_y, y_test, y_pred = train_model_with_extended_features(df, i)
         plot_y_test_vs_y_pred_line(y_test, y_pred)
