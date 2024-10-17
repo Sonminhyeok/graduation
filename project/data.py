@@ -88,7 +88,6 @@ def fillna_func_mean(df):
     return df
 #메뉴 등장 횟수 추가
 def count_menu(df):
-    print(df.columns)
     df['breakfast_count'] = df['breakfast'].map(df['breakfast'].value_counts())
     df['lunch_count'] = df['lunch'].map(df['lunch'].value_counts())
     df['dinner_count'] = df['dinner'].map(df['dinner'].value_counts())
@@ -107,17 +106,25 @@ def extract_main_foods(df):
             group['embedding_sum'] = group[embedding_column].apply(
                 lambda x: sum([v for v in x[:3] if isinstance(v, (int, float))]) if isinstance(x, list) else 0
             )
+            
             # 합계가 가장 큰 메뉴의 인덱스를 찾음
             max_idx = group['embedding_sum'].idxmax()
             main_food = group.loc[max_idx, menu_column]
             main_food_embedding = group.loc[max_idx, embedding_column]
-
-            # main_food가 문자열인지 확인하고 '밥' 또는 '김치'로 끝나는 메뉴인지 확인
+            
+            # main_food가 문자열인지 확인하고 특정 조건을 만족하는지 확인
             if isinstance(main_food, str) and ('우유' in main_food or '밥' in main_food or (main_food.endswith('김치') and len(main_food) == len('김치') + 2)):
                 # 합계가 두 번째로 큰 메뉴를 선택
-                second_max_idx = group.drop(max_idx)['embedding_sum'].idxmax()
-                main_food = group.loc[second_max_idx, menu_column]
-                main_food_embedding = group.loc[second_max_idx, embedding_column]
+                remaining_group = group.drop(max_idx)
+                
+                # 남은 그룹이 비어 있지 않은지 확인
+                if not remaining_group.empty:
+                    second_max_idx = remaining_group['embedding_sum'].idxmax()
+                    main_food = group.loc[second_max_idx, menu_column]
+                    main_food_embedding = group.loc[second_max_idx, embedding_column]
+                else:
+                    # 남은 그룹이 비어 있다면 기본값 반환 (None 또는 다른 처리)
+                    return None, None
 
             return main_food, main_food_embedding
 
@@ -178,7 +185,7 @@ def extract_embedding_sums(df):
 def main():
 
     file_list = glob.glob('./project/data/embedded_data*.csv')
-    #fillna [000] and maindish ver
+    # fillna [000] and maindish ver
     
     
     for file in file_list:
@@ -194,22 +201,7 @@ def main():
         df.to_csv(f'./project/data/main_data{file_name}.csv', encoding='cp949', index=False)
     
     
-    #fillna mean and sum ver
-    # for file in file_list:
-    #     df= load_and_prepare_data(file)
-    #     df = fillna_func_mean(df)
-        
-    #     df = extract_embedding_sums(df)
-
-        
-    #     # df = count_menu(df)
-        
-    #     file_name=file.split("\\")[1].split(".")[0].split("data")[1]
-    #     df.to_csv(f'./project/data/sum_data{file_name}.csv', encoding='cp949', index=False)
-    
-    
     # 각 파일에서 데이터를 읽어와 크롤링
-    
     
     # file_list = glob.glob('./project/data/before/data*.csv')
     # for file in file_list:
@@ -219,6 +211,8 @@ def main():
     #     df = embed_data_crawling(df)
     #     file_name=file.split("\\")[1].split(".")[0]
     #     df.to_csv(f'./project/data/before/embedded_{file_name}.csv', encoding='cp949', index=False)
+        
+        
 if __name__ == "__main__":
     
     main()
